@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="description" content="UPI Merchant MDR Calculator for P2M transactions under official 2026 framework.">
+  <title>UPI MDR Calculator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="site-wrapper">
+    <!-- App Bar on Mobile / Website Nav on Desktop -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+            <path d="M6 15h2"></path>
+            <path d="M12 15h6"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">UPI MDR Calculator</h1>
+          <span class="desktop-subtitle">Merchant P2M Fee Estimator (2026 Framework)</span>
+        </div>
+      </div>
+
+      <!-- Small Theme Switcher -->
+      <fieldset class="theme-switcher" aria-label="Theme mode">
+        <legend class="sr-only">Theme</legend>
+        <label class="theme-option" title="Light theme">
+          <input type="radio" name="theme-mode" value="light" id="theme-light">
+          <span class="theme-label" aria-label="Light">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </span>
+        </label>
+        <label class="theme-option" title="Dark theme">
+          <input type="radio" name="theme-mode" value="dark" id="theme-dark">
+          <span class="theme-label" aria-label="Dark">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+        </label>
+        <label class="theme-option" title="Auto: Dark 6 PM–6 AM IST">
+          <input type="radio" name="theme-mode" value="system" id="theme-system" checked>
+          <span class="theme-label" aria-label="Auto IST">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
+        </label>
+      </fieldset>
+    </header>
+
+    <!-- Main Content: Mobile App stack vs Desktop 2-column web view -->
+    <main class="main-layout" id="calculator">
+      <!-- Input Panel -->
+      <section class="panel-card input-panel" aria-label="Calculator Inputs">
+        <!-- Amount Field -->
+        <div class="form-field">
+          <label for="amount-input" class="field-label">Transaction Amount</label>
+          <div class="input-rupee-wrapper">
+            <span class="rupee-sign" aria-hidden="true">₹</span>
+            <input
+              type="text"
+              id="amount-input"
+              class="amount-input"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="0"
+              value="2,500"
+            >
+          </div>
+
+          <!-- Presets -->
+          <div class="preset-chips" aria-label="Quick presets">
+            <button type="button" class="chip" data-amount="2000">₹2,000</button>
+            <button type="button" class="chip" data-amount="2001">₹2,001</button>
+            <button type="button" class="chip" data-amount="5000">₹5,000</button>
+            <button type="button" class="chip" data-amount="25000">₹25,000</button>
+            <button type="button" class="chip" data-amount="75000">₹75,000</button>
+            <button type="button" class="chip" data-amount="100000">₹1,00,000</button>
+          </div>
+        </div>
+
+        <!-- Category Selector -->
+        <div class="form-field">
+          <span class="field-label" id="category-label">Merchant Category</span>
+          <div class="category-pills" role="radiogroup" aria-labelledby="category-label">
+            <label class="category-pill">
+              <input type="radio" name="merchant-category" value="standard" checked>
+              <span class="pill-btn">Standard <small>(0.4%)</small></span>
+            </label>
+            <label class="category-pill">
+              <input type="radio" name="merchant-category" value="p2pm">
+              <span class="pill-btn">Small / P2PM <small>(₹0)</small></span>
+            </label>
+            <label class="category-pill">
+              <input type="radio" name="merchant-category" value="essential">
+              <span class="pill-btn">Essential <small>(₹5)</small></span>
+            </label>
+            <label class="category-pill">
+              <input type="radio" name="merchant-category" value="capital_markets">
+              <span class="pill-btn">Capital Mkts <small>(0.02%)</small></span>
+            </label>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Results & Details Panel -->
+      <div class="results-column">
+        <!-- Primary Result Card -->
+        <section class="result-container" aria-label="Result">
+          <div class="primary-result">
+            <span class="result-eyebrow">Estimated MDR (Merchant Cost)</span>
+            <div class="result-number-row" aria-live="polite" id="mdr-aria-announcement">
+              <span class="result-currency">₹</span>
+              <span class="result-value" id="mdr-value">10.00</span>
+            </div>
+            <div class="result-rate-tag" id="rate-tag">0.40%</div>
+          </div>
+
+          <!-- Native iOS/Android Grouped Breakdown List -->
+          <div class="breakdown-list">
+            <div class="breakdown-row">
+              <span class="row-label">Transaction Value</span>
+              <span class="row-value" id="gross-value">₹2,500.00</span>
+            </div>
+            <div class="breakdown-row">
+              <span class="row-label">Estimated MDR</span>
+              <span class="row-value fee-value" id="fee-breakdown-value">-₹10.00</span>
+            </div>
+            <div class="breakdown-divider" role="separator"></div>
+            <div class="breakdown-row highlight-row">
+              <span class="row-label">Net Merchant Payout</span>
+              <span class="row-value highlight-value" id="net-value">₹2,490.00</span>
+            </div>
+            <div class="breakdown-row cap-row">
+              <span class="row-label">Applicable Fee Cap</span>
+              <span class="row-value" id="cap-value">₹300.00</span>
+            </div>
+          </div>
+
+          <div class="explanation-box" id="explanation-box" role="status">
+            <p id="explanation-text">Standard 0.40% applies above ₹2,000 threshold.</p>
+          </div>
+
+          <!-- Merchant fee customer protection notice -->
+          <p class="customer-protection-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Merchant-side cost. UPI customers are not charged MDR.
+          </p>
+        </section>
+
+        <!-- Hidden / Collapsible Rules on Mobile, Clean Card on Desktop -->
+        <details class="accordion-section" id="how-calculated">
+          <summary class="accordion-trigger">
+            <span class="summary-title">Rules & Official Sources</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </summary>
+          <div class="accordion-body">
+            <div class="table-wrapper">
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Category</th>
+                    <th scope="col">Rate (&gt; ₹2,000)</th>
+                    <th scope="col">Cap</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Transactions &le; ₹2,000</td>
+                    <td>₹0 (Free)</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>P2PM Small Merchant</td>
+                    <td>₹0 (Free)</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>Standard Merchant</td>
+                    <td>0.40%</td>
+                    <td>₹300 (at ₹75k+)</td>
+                  </tr>
+                  <tr>
+                    <td>Essential Sector</td>
+                    <td>₹5 flat</td>
+                    <td>₹5</td>
+                  </tr>
+                  <tr>
+                    <td>Capital Markets</td>
+                    <td>0.02%</td>
+                    <td>₹300</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="official-links">
+              <a href="https://www.pib.gov.in/PressReleseDetailm.aspx?PRID=2310586&lang=1&reg=3" target="_blank" rel="noopener noreferrer">PIB Notice (15 Sept 2026) &rarr;</a>
+              <a href="https://financialservices.gov.in/faqs-merchant-discount-rate-mdr-select-upi-p2m-transactions" target="_blank" rel="noopener noreferrer">DFS FAQs &rarr;</a>
+            </div>
+          </div>
+        </details>
+      </div>
+    </main>
+
+    <!-- Government of India Disclaimer -->
+    <footer class="app-disclaimer">
+      <p>Independent estimation tool. In no way affiliated with, endorsed by, or related to the Government of India or NPCI.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

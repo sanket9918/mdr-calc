@@ -1,0 +1,809 @@
+/* ==========================================================================
+   UPI MDR Calculator - Native iOS & Android Fintech Aesthetic
+   Mobile: Native app feel (SF/Roboto system stack, safe-area insets,
+           grouped receipt list, tactile haptic springs, zero jank)
+   Desktop: Clean modern financial web portal (2-column sticky dashboard)
+   ========================================================================== */
+
+:root {
+  /* System Colors - Light Mode (High Contrast & Clean Tonal Layers) */
+  --sys-primary: #0062e3;
+  --sys-primary-container: #dce7ff;
+  --sys-on-primary-container: #001b44;
+
+  --sys-bg: #f2f4f8;
+  --sys-surface: #ffffff;
+  --sys-surface-secondary: #f8f9fc;
+  --sys-surface-tertiary: #edf1f7;
+
+  --sys-text-primary: #111827;
+  --sys-text-secondary: #4b5563;
+  --sys-text-tertiary: #9ca3af;
+
+  --sys-border: #e2e8f0;
+  --sys-border-subtle: #f1f5f9;
+
+  --sys-success: #059669;
+  --sys-success-container: #d1fae5;
+  --sys-success-text: #065f46;
+
+  /* Native Typography Stack: Apple SF Pro on iOS / Roboto & Google Sans on Android */
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Roboto", "Google Sans", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Google Sans", system-ui, sans-serif;
+
+  /* Native Radius Tokens */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Native Spring Physics Curves */
+  --ease-spring: cubic-bezier(0.32, 1.5, 0.64, 1);
+  --ease-native: cubic-bezier(0.2, 0, 0, 1);
+  --duration-tap: 120ms;
+  --duration-state: 240ms;
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-float: 0 8px 24px -4px rgba(0, 98, 227, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+/* Dark Mode (iOS True Dark / Android Material Dark) */
+[data-theme="dark"] {
+  --sys-primary: #7dadff;
+  --sys-primary-container: #003a8c;
+  --sys-on-primary-container: #dce7ff;
+
+  --sys-bg: #0b0f17;
+  --sys-surface: #151c27;
+  --sys-surface-secondary: #1a2230;
+  --sys-surface-tertiary: #222b3b;
+
+  --sys-text-primary: #f9fafb;
+  --sys-text-secondary: #cbd5e1;
+  --sys-text-tertiary: #64748b;
+
+  --sys-border: #263242;
+  --sys-border-subtle: #1e2736;
+
+  --sys-success: #34d399;
+  --sys-success-container: #064e3b;
+  --sys-success-text: #a7f3d0;
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Base Reset & Native Optimizations */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  font-family: var(--font-system);
+  background-color: var(--sys-bg);
+  color: var(--sys-text-primary);
+  letter-spacing: -0.01em;
+  transition: background-color var(--duration-state) ease, color var(--duration-state) ease;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--sys-bg);
+  line-height: 1.45;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ==========================================================================
+   MOBILE APP EXPERIENCE (Default / < 768px)
+   ========================================================================== */
+
+.site-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Native App Bar (Translucent Blur Header) */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-bottom: 12px;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  background: rgba(242, 244, 248, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--sys-border);
+}
+
+[data-theme="dark"] .app-header {
+  background: rgba(11, 15, 23, 0.85);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--sys-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 98, 227, 0.25);
+}
+
+.brand-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--sys-text-primary);
+}
+
+.desktop-subtitle {
+  display: none; /* App title bar only on mobile */
+}
+
+/* Native Compact Segmented Theme Control */
+.theme-switcher {
+  display: inline-flex;
+  background: var(--sys-surface-tertiary);
+  border: 0.5px solid var(--sys-border);
+  border-radius: var(--radius-pill);
+  padding: 2px;
+  gap: 2px;
+}
+
+.theme-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.theme-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  color: var(--sys-text-secondary);
+  transition: transform var(--duration-tap) var(--ease-spring),
+              background-color var(--duration-tap) ease,
+              color var(--duration-tap) ease;
+}
+
+.theme-option input:checked + .theme-label {
+  background: var(--sys-surface);
+  color: var(--sys-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.theme-option:active .theme-label {
+  transform: scale(0.9);
+}
+
+/* Main App Scroll Area */
+.main-layout {
+  padding-top: 14px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.panel-card {
+  background: var(--sys-surface);
+  border: 0.5px solid var(--sys-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.results-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--sys-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 2px;
+}
+
+/* Native Large Currency Input (GPay / Apple Cash Style) */
+.input-rupee-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--sys-surface-secondary);
+  border: 1.5px solid var(--sys-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-tap) ease,
+              box-shadow var(--duration-tap) ease,
+              background var(--duration-tap) ease;
+}
+
+.input-rupee-wrapper:focus-within {
+  border-color: var(--sys-primary);
+  box-shadow: 0 0 0 3px rgba(0, 98, 227, 0.15);
+  background: var(--sys-surface);
+}
+
+.rupee-sign {
+  position: absolute;
+  left: 14px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--sys-primary);
+  pointer-events: none;
+  user-select: none;
+}
+
+.amount-input {
+  width: 100%;
+  height: 56px;
+  padding: 6px 14px 6px 38px;
+  border: none;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--sys-text-primary);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+/* Presets: Horizontal touch chips */
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  min-height: 36px;
+  padding: 6px 13px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--sys-border);
+  background: var(--sys-surface-secondary);
+  color: var(--sys-text-primary);
+  font-family: var(--font-system);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--duration-tap) var(--ease-spring),
+              background-color var(--duration-tap) ease,
+              border-color var(--duration-tap) ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.chip:hover {
+  background: var(--sys-primary-container);
+  color: var(--sys-on-primary-container);
+  border-color: var(--sys-primary);
+}
+
+.chip:active {
+  transform: scale(0.94);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--sys-primary);
+  outline-offset: 2px;
+}
+
+/* Category Segmented Grid (iOS/Android Native Segmented Buttons) */
+.category-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.category-pill {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.category-pill input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pill-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 8px;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--sys-border);
+  background: var(--sys-surface-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--sys-text-primary);
+  transition: transform var(--duration-tap) var(--ease-spring),
+              border-color var(--duration-tap) ease,
+              background-color var(--duration-tap) ease;
+}
+
+.pill-btn small {
+  font-size: 0.71875rem;
+  font-weight: 600;
+  color: var(--sys-text-secondary);
+  margin-top: 1px;
+}
+
+.category-pill:active .pill-btn {
+  transform: scale(0.96);
+}
+
+.category-pill input:checked + .pill-btn {
+  border-color: var(--sys-primary);
+  background: var(--sys-primary-container);
+  color: var(--sys-on-primary-container);
+  box-shadow: 0 2px 6px rgba(0, 98, 227, 0.12);
+}
+
+.category-pill input:checked + .pill-btn small {
+  color: var(--sys-on-primary-container);
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   RESULT CARD (Native Fintech Receipt Presentation)
+   ========================================================================== */
+
+.result-container {
+  background: var(--sys-surface);
+  border: 0.5px solid var(--sys-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 22px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: background var(--duration-state) ease, border-color var(--duration-state) ease;
+}
+
+.result-container.state-zero {
+  background: linear-gradient(180deg, rgba(209, 250, 229, 0.35) 0%, var(--sys-surface) 65%);
+}
+
+.result-container.state-fee {
+  background: linear-gradient(180deg, rgba(220, 231, 255, 0.45) 0%, var(--sys-surface) 65%);
+}
+
+[data-theme="dark"] .result-container.state-zero {
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.35) 0%, var(--sys-surface) 65%);
+}
+
+[data-theme="dark"] .result-container.state-fee {
+  background: linear-gradient(180deg, rgba(0, 58, 140, 0.35) 0%, var(--sys-surface) 65%);
+}
+
+/* Spring Pulse on update */
+.result-container.pulse-spring {
+  animation: nativePulse var(--duration-state) var(--ease-spring);
+}
+
+@keyframes nativePulse {
+  0% { transform: scale(0.985); }
+  60% { transform: scale(1.012); }
+  100% { transform: scale(1); }
+}
+
+.primary-result {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.result-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sys-text-secondary);
+}
+
+.result-number-row {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  font-family: var(--font-display);
+  color: var(--sys-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.state-zero .result-number-row {
+  color: var(--sys-success);
+}
+
+.result-currency {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+.result-value {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.result-rate-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--sys-surface-tertiary);
+  color: var(--sys-text-primary);
+  border: 0.5px solid var(--sys-border);
+}
+
+/* Inset Grouped Breakdown List (Signature iOS & Android Receipt Table) */
+.breakdown-list {
+  background: var(--sys-surface-secondary);
+  border: 0.5px solid var(--sys-border);
+  border-radius: var(--radius-md);
+  padding: 6px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  font-size: 0.84rem;
+}
+
+.row-label {
+  color: var(--sys-text-secondary);
+  font-weight: 500;
+}
+
+.row-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--sys-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.fee-value {
+  color: var(--sys-text-primary);
+}
+
+.breakdown-divider {
+  height: 0.5px;
+  background-color: var(--sys-border);
+  margin: 2px 0;
+}
+
+.highlight-row .row-label {
+  font-weight: 700;
+  color: var(--sys-text-primary);
+}
+
+.highlight-value {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--sys-primary);
+}
+
+.cap-row {
+  font-size: 0.78125rem;
+  opacity: 0.85;
+}
+
+/* Explanation Box */
+.explanation-box {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--sys-surface-secondary);
+  border-left: 3px solid var(--sys-primary);
+  font-size: 0.78125rem;
+  line-height: 1.4;
+  color: var(--sys-text-primary);
+}
+
+.state-zero .explanation-box {
+  border-left-color: var(--sys-success);
+}
+
+/* Customer Protection Note */
+.customer-protection-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.71875rem;
+  color: var(--sys-text-secondary);
+  text-align: center;
+}
+
+.customer-protection-note svg {
+  flex-shrink: 0;
+  color: var(--sys-success);
+}
+
+/* Native Collapsible Section */
+.accordion-section {
+  border: 0.5px solid var(--sys-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--sys-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.accordion-trigger {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  color: var(--sys-text-secondary);
+  transition: background-color var(--duration-tap) ease;
+}
+
+.accordion-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-trigger:hover {
+  background: var(--sys-surface-secondary);
+  color: var(--sys-text-primary);
+}
+
+.chevron {
+  transition: transform var(--duration-state) var(--ease-spring);
+  color: var(--sys-text-secondary);
+}
+
+.accordion-section[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  padding: 0 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: var(--sys-text-secondary);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--sys-border);
+}
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  text-align: left;
+}
+
+.rules-table th {
+  background: var(--sys-surface-tertiary);
+  color: var(--sys-text-primary);
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 0.5px solid var(--sys-border);
+}
+
+.rules-table td {
+  padding: 8px 10px;
+  border-bottom: 0.5px solid var(--sys-border);
+  color: var(--sys-text-primary);
+}
+
+.rules-table tr:last-child td {
+  border-bottom: none;
+}
+
+.official-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.official-links a {
+  color: var(--sys-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   DESKTOP WEBSITE EXPERIENCE (min-width: 768px)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  body {
+    padding: 40px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .site-wrapper {
+    max-width: 960px;
+    min-height: auto;
+    gap: 28px;
+  }
+
+  /* Desktop Web Navigation Bar */
+  .app-header {
+    position: static;
+    padding: 16px 24px;
+    border-radius: var(--radius-xl);
+    border: 0.5px solid var(--sys-border);
+    background: var(--sys-surface);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: none;
+  }
+
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-md);
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .brand-title {
+    font-size: 1.25rem;
+  }
+
+  .desktop-subtitle {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--sys-text-secondary);
+    font-weight: 500;
+  }
+
+  /* Desktop Two-Column Dashboard */
+  .main-layout {
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .panel-card {
+    padding: 26px 22px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .results-column {
+    position: sticky;
+    top: 24px;
+  }
+
+  .result-container {
+    padding: 26px 22px 20px;
+    box-shadow: var(--shadow-float);
+  }
+
+  .result-value {
+    font-size: 3.75rem;
+  }
+
+  .category-pills {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1000px) {
+  .site-wrapper {
+    max-width: 1020px;
+  }
+}
+
+/* App Disclaimer */
+.app-disclaimer {
+  padding: 12px 16px 20px;
+  text-align: center;
+  font-size: 0.71875rem;
+  line-height: 1.45;
+  color: var(--sys-text-tertiary);
+}
+
+@media (min-width: 768px) {
+  .app-disclaimer {
+    padding: 0 0 16px;
+  }
+}
+
+/* Reduced Motion Access */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
