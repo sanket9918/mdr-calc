@@ -120,6 +120,7 @@
 
   function updateCalculator() {
     const rawAmount = parseAmount(amountInput.value);
+    const isEasterEgg = rawAmount === 2014;
     let selectedCategory = 'standard';
 
     for (const radio of categoryInputs) {
@@ -137,7 +138,7 @@
 
     // Update Result
     mdrValueEl.textContent = formatINR(mdrInRupees);
-    rateTagEl.textContent = result.rateLabel;
+    rateTagEl.textContent = isEasterEgg ? 'sabka saath, sabka vikas' : result.rateLabel;
     netValueEl.textContent = '₹' + formatINR(netInRupees);
     capValueEl.textContent = result.capPaise > 0 ? '₹' + formatINR(result.capPaise / 100) : 'None';
     explanationTextEl.textContent = result.explanation;
@@ -154,6 +155,7 @@
 
     // Update result state
     if (resultContainerEl) {
+      resultContainerEl.classList.toggle('state-saffron', isEasterEgg);
       if (result.mdrPaise === 0) {
         resultContainerEl.classList.add('state-zero');
         resultContainerEl.classList.remove('state-fee');

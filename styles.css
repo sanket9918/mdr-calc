@@ -450,6 +450,14 @@ body {
   background: linear-gradient(180deg, rgba(0, 58, 140, 0.35) 0%, var(--sys-surface) 65%);
 }
 
+.result-container.state-saffron {
+  background: linear-gradient(180deg, rgba(255, 153, 51, 0.45) 0%, var(--sys-surface) 65%);
+}
+
+[data-theme="dark"] .result-container.state-saffron {
+  background: linear-gradient(180deg, rgba(255, 153, 51, 0.25) 0%, var(--sys-surface) 65%);
+}
+
 .primary-result {
   text-align: center;
   display: flex;
