@@ -7,9 +7,11 @@
   'use strict';
 
   const STORAGE_KEY_THEME = 'upi-mdr-theme-preference';
+  const MAX_AMOUNT = 1000000000;
 
   // DOM Elements
   const amountInput = document.getElementById('amount-input');
+  let lastValidAmount = amountInput.value;
   const categoryInputs = document.querySelectorAll('input[name="merchant-category"]');
   const themeInputs = document.querySelectorAll('input[name="theme-mode"]');
   const presetChips = document.querySelectorAll('.preset-chips .chip');
@@ -38,14 +40,14 @@
     return includeDecimals ? inrFormatter.format(val) : inrIntFormatter.format(val);
   }
 
+  function normalizeAmount(str) {
+    const value = String(str).replace(/,/g, '').replace(/^0+(?=\d)/, '');
+    if (!/^\d*(?:\.\d{0,2})?$/.test(value)) return null;
+    return Number(value) > MAX_AMOUNT ? String(MAX_AMOUNT) : value;
+  }
+
   function parseAmount(str) {
-    if (!str) return 0;
-    const cleaned = String(str).replace(/[^\d.]/g, '');
-    const parts = cleaned.split('.');
-    if (parts.length > 2) {
-      return parseFloat(parts[0] + '.' + parts.slice(1).join('')) || 0;
-    }
-    return parseFloat(cleaned) || 0;
+    return Number(normalizeAmount(str)) || 0;
   }
 
   /**
@@ -165,6 +167,7 @@
       'aria-label',
       `Estimated MDR is ₹${formatINR(mdrInRupees)}. Net settlement is ₹${formatINR(netInRupees)}.`
     );
+    lastValidAmount = amountInput.value;
   }
 
   function formatAmountFieldOnBlur() {
@@ -238,7 +241,17 @@
 
   function init() {
     // Amount listeners
-    amountInput.addEventListener('input', updateCalculator);
+    amountInput.addEventListener('beforeinput', (event) => {
+      if (event.data === null || event.isComposing) return;
+      const nextValue = amountInput.value.slice(0, amountInput.selectionStart)
+        + event.data + amountInput.value.slice(amountInput.selectionEnd);
+      if (normalizeAmount(nextValue) === null) event.preventDefault();
+    });
+    amountInput.addEventListener('input', () => {
+      const value = normalizeAmount(amountInput.value);
+      amountInput.value = value === null ? lastValidAmount : value;
+      updateCalculator();
+    });
     amountInput.addEventListener('blur', formatAmountFieldOnBlur);
     amountInput.addEventListener('focus', () => {
       const raw = parseAmount(amountInput.value);
@@ -246,6 +259,7 @@
         amountInput.value = String(raw);
         amountInput.select();
       }
+      lastValidAmount = amountInput.value;
     });
 
     // Category listeners
