@@ -150,7 +150,7 @@
       feeBreakdownEl.textContent = mdrInRupees > 0 ? '-₹' + formatINR(mdrInRupees) : '₹0.00';
     }
 
-    // Expressive dynamic mood shift & spring animation
+    // Update result state
     if (resultContainerEl) {
       if (result.mdrPaise === 0) {
         resultContainerEl.classList.add('state-zero');
@@ -159,10 +159,6 @@
         resultContainerEl.classList.add('state-fee');
         resultContainerEl.classList.remove('state-zero');
       }
-
-      resultContainerEl.classList.remove('pulse-spring');
-      void resultContainerEl.offsetWidth; // trigger reflow
-      resultContainerEl.classList.add('pulse-spring');
     }
 
     mdrAriaEl.setAttribute(

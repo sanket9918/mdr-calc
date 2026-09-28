@@ -42,8 +42,8 @@
   /* Native Spring Physics Curves */
   --ease-spring: cubic-bezier(0.32, 1.5, 0.64, 1);
   --ease-native: cubic-bezier(0.2, 0, 0, 1);
-  --duration-tap: 120ms;
-  --duration-state: 240ms;
+  --duration-tap: 60ms;
+  --duration-state: 120ms;
 
   /* Shadows */
   --shadow-card: 0 2px 8px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
@@ -447,17 +447,6 @@ body {
 
 [data-theme="dark"] .result-container.state-fee {
   background: linear-gradient(180deg, rgba(0, 58, 140, 0.35) 0%, var(--sys-surface) 65%);
-}
-
-/* Spring Pulse on update */
-.result-container.pulse-spring {
-  animation: nativePulse var(--duration-state) var(--ease-spring);
-}
-
-@keyframes nativePulse {
-  0% { transform: scale(0.985); }
-  60% { transform: scale(1.012); }
-  100% { transform: scale(1); }
 }
 
 .primary-result {
